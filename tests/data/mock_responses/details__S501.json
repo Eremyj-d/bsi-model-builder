@@ -1,0 +1,96 @@
+{
+ "kits": [
+  {
+   "title": "COLUMN CAPS AND SHEAR TABS",
+   "refs": "S501 details 2, 3",
+   "no_steel": false,
+   "items": [
+    {
+     "detail_ref": "2/S501",
+     "condition": "Cap plate at every column",
+     "item": "Cap plate",
+     "size_spec": "PL 3/4x8x0'-8\"",
+     "unit_basis": "1 per column",
+     "unit": "EA",
+     "lb_per_unit": 0,
+     "qty_applied": 6,
+     "qty_source": "6 columns",
+     "notes": "shop welded",
+     "finish": "Primed",
+     "grade": "A572 Gr.50",
+     "rfi": []
+    },
+    {
+     "detail_ref": "3/S501",
+     "condition": "Beam-to-beam shear connection",
+     "item": "Shear tab",
+     "size_spec": "PL 3/8x4x0'-9\"",
+     "unit_basis": "1 per W12 end",
+     "unit": "EA",
+     "lb_per_unit": 0,
+     "qty_applied": 14,
+     "qty_source": "14 W12x19 ends",
+     "notes": "3 bolts per detail",
+     "finish": "Primed",
+     "grade": "A572 Gr.50",
+     "rfi": []
+    }
+   ]
+  },
+  {
+   "title": "DECK ATTACHMENT",
+   "refs": "S501 detail 4",
+   "no_steel": true,
+   "items": [
+    {
+     "detail_ref": "4/S501",
+     "condition": "Deck to beam",
+     "item": "\u2014",
+     "size_spec": "puddle welds by deck installer",
+     "unit_basis": "\u2014",
+     "unit": "\u2014",
+     "lb_per_unit": 0,
+     "qty_source": "",
+     "notes": "no BSI steel",
+     "finish": "Primed",
+     "grade": "",
+     "rfi": []
+    }
+   ]
+  }
+ ],
+ "bolts": [
+  {
+   "group": "Beam-to-Beam Shear",
+   "connection_type": "shear tab",
+   "location": "W12x19 to W12x26",
+   "spec": "3/4\" x 2 1/2\" A325-N",
+   "per_conn": 3,
+   "lb_ea": 0.65,
+   "finish": "Plain",
+   "notes": "per 3/S501",
+   "rfi": [],
+   "allowance": false
+  },
+  {
+   "group": "Beam-on-Column Cap Plate",
+   "connection_type": "cap plate",
+   "location": "beams on columns",
+   "spec": "3/4\" x 2 1/2\" A325-N",
+   "per_conn": 4,
+   "lb_ea": 0.65,
+   "finish": "Plain",
+   "notes": "per 2/S501",
+   "rfi": [],
+   "allowance": false
+  }
+ ],
+ "misc_parts": [],
+ "misc_metals": [],
+ "sheet_notes": [
+  {
+   "text": "Det. 1: PL 3/4 x 12 x 1'-0\" base plate, (4) 3/4\" dia F1554 Gr.55 anchor rods."
+  }
+ ],
+ "rfis": []
+}

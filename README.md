@@ -1,13 +1,16 @@
 # BSI Model Builder
 
-Windows desktop app for Bohling Steel estimating: turns the **Model Geometry** table of a takeoff into
-**`<Job>_Model.ifc`** — an IFC2x3 structural steel model with parametric AISC profiles — plus a manifest,
-an independent check report and plan / elevation / isometric views.
+Windows desktop app for Bohling Steel estimating.
+
+**Takeoff page (0.2)** — drawing PDFs in → the 12-tab Bohling takeoff workbook, the pre-bid RFI log
+(external + INTERNAL), the PRELIMINARY scope letter, the takeoff notes and the IFC model, through the Claude
+API with BSI's own key. Review the draft in Excel, then rebuild the model and documents from the edited workbook.
+
+**Model page (0.1)** — the **Model Geometry** table of a takeoff → **`<Job>_Model.ifc`** (IFC2x3, parametric
+AISC profiles) + manifest + independent check report + plan / elevation / isometric views. Runs offline.
 
 The IFC imports straight into **Tekla PowerFab** Estimating / Advance Bill (map `PRELIM_MARK` → Reference #)
 and goes to the **detailer** as the reference model for shop drawings once a job is booked.
-
-No AI, no API key, no network: the app runs entirely on the PC.
 
 ## Install (Windows)
 1. Download `BSI_Model_Builder_v<version>_win64.zip` from the Releases page.
@@ -32,6 +35,8 @@ Full conventions (coordinates, cardinal points, rotations, sizes) are on the app
 
 ## Command line
 ```
+BSI_Model_Builder_cli takeoff run S.pdf A.pdf … --job "Job name" --code CODE --out DIR [--model …] [--notes "…"]
+BSI_Model_Builder_cli takeoff docs --xlsx Job_Takeoff.xlsx --json Job_takeoff.json
 BSI_Model_Builder_cli build --job Job_job.json --xlsx Job_Takeoff.xlsx [--out DIR] [--tab] [--lenient]
 BSI_Model_Builder_cli build --job Job_job.json --geom Job_ModelGeometry.csv
 BSI_Model_Builder_cli check Job_Model.ifc --geom Job_ModelGeometry.csv
@@ -42,12 +47,13 @@ BSI_Model_Builder_cli selftest
 ## Develop
 ```
 pip install -r requirements.txt
-python -m pytest -q                      # 7 tests: profiles, job file, synthetic frame, GUID stability, Phoenix Bristol, bad rows, tamper detection
+python -m pytest -q                      # model pipeline, workbook / docs builders, PDF geometry pass on a synthetic set, takeoff end to end (mock API)
 python -m bsi_model_builder              # the window
 python -m bsi_model_builder selftest     # bundled 23-piece frame → PASS
 pip install pyinstaller && pyinstaller --noconfirm --clean packaging/BSI_Model_Builder.spec   # dist/BSI_Model_Builder/
 ```
-Python 3.11–3.13. Dependencies: ifcopenshell, openpyxl, numpy, matplotlib, pillow, pytest (ifcopenshell's EXPRESS rule checker uses it).
+Python 3.11–3.13. Dependencies: ifcopenshell, openpyxl, numpy, matplotlib, pillow, pytest (ifcopenshell's EXPRESS rule checker uses it),
+python-docx, pymupdf, anthropic, keyring; reportlab for the synthetic test drawings.
 
 ## Release
 Tag and push: `git tag v0.1.1 && git push --tags`. GitHub Actions runs the tests on Ubuntu and Windows,
@@ -60,7 +66,8 @@ and `version` in `pyproject.toml` first.
 bsi_model_builder/
   core/        aisc_profiles · geometry_tab · build_ifc · check_ifc · jobfile · pipeline
   ui/          app (Tkinter window) · jobeditor · settings
-  takeoff/     phase 2 placeholder — takeoff from drawings through the Claude API
+  takeoff/     model (the takeoff JSON) · engine + schemas + prompts (API stages) · providers (Anthropic / mock, cache) ·
+               pdfset (PDF ingestion + geometry pass) · workbook · docs · outputs · sample · credentials
   data/aisc/   AISC Shapes Database v16.0 CSVs (from the Apache-2.0 steelpy package)
   data/selftest/  bundled synthetic frame
   cli.py · selftest.py · __main__.py
@@ -71,9 +78,11 @@ docs/          USER_GUIDE.md
 ```
 
 ## Roadmap
-- **0.1** (this) — IFC model step: Model Geometry → IFC + check + views. Shakedown job: Phoenix Bristol TN (379 pieces).
-- **0.2** — Phase 2: takeoff from drawings inside the app through the Claude API (drawings in → 12-tab
-  workbook + Model Geometry out → estimator review → Build). Interface sketched in `bsi_model_builder/takeoff/`.
-- Wishlist: embedded 3D viewer; IFC4 export option; direct write into the takeoff workbook in place.
+- **0.1** — IFC model step: Model Geometry → IFC + check + views. Shakedown job: Phoenix Bristol TN (379 pieces).
+- **0.2** (this) — Takeoff from drawings through the Claude API: index / notes / columns / framing (with the
+  app's geometry pass) / details / synthesis stages → workbook + RFI log + scope letter + notes + IFC; review in
+  Excel; disk cache per stage; mock provider for tests. Proven on the synthetic set; real-set validation next.
+- Next: validate on real sets (compare against the session takeoffs of Newport News / Bay Creek / Phoenix
+  Bristol), tune prompts per sheet kind, addenda / WAS-NOW revisions, erection summary, embedded 3D viewer.
 
 Internal tool of Bohling Steel, Inc. — Lynchburg, VA.

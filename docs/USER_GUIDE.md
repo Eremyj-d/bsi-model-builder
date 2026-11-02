@@ -89,3 +89,75 @@ end points are compared, otherwise the file is checked on its own.
   round HSS as `HSS9.625X0.500`, pipe as `PIPE8STD` / `PIPE6XS`.
 * **SmartScreen** — the exe is unsigned; *More info → Run anyway*.
 * Settings (last paths, window size) live in `%APPDATA%\BSI Model Builder\settings.json`; delete it to reset.
+
+---
+
+# Part 2 — Takeoff from drawings (0.2)
+
+## 7. What the Takeoff page does
+Drawings in → the same deliverables a Bohling takeoff session produces: the 12-tab takeoff workbook (Model
+Geometry tab included), the pre-bid RFI log (external + INTERNAL), the PRELIMINARY scope letter, the takeoff
+notes, the job file, and the IFC model with its check and views. The drawing reading runs through the Claude
+API with BSI's own key; everything else (weights, totals, formulas, documents, the IFC) is computed by the app.
+
+## 8. The API account — what's involved
+* **Account**: console.anthropic.com. Separate from the claude.ai subscription; billed per use (tokens in and
+  out), with a prepaid balance or a monthly invoice depending on how it is set up. One account for the company
+  is enough; make the key under BSI's name, not a personal one.
+* **Key**: Settings → API keys → Create key. Paste it once into the app (*API key…* on the Takeoff page). It is
+  stored in **Windows Credential Manager** under "BSI Model Builder" — not in any job folder, not in the
+  settings file. Anyone with the key can spend on the account, so treat it like a password; the Console lets
+  you revoke and re-issue it any time.
+* **Cost**: the app prints the token count and an estimated dollar figure per stage and per run. The rates it
+  uses are a table in the app (defaults are placeholders — update them from the Console's pricing page). As a
+  rough guide a full run over a 100–150-sheet set is in the single-digit dollars range at opus-class prices and
+  well under that on a sonnet-class model; re-running the same set costs nothing because every stage answer is
+  cached on disk next to the job (`.api_cache`). A changed sheet or an edited job note re-runs only the stages
+  that see it.
+* **Model**: the dropdown lists the current Claude models. The default is the strongest reading model
+  (drawing reading is the hard part); choose a smaller one for a quick first pass.
+* **Data**: pages are sent as images plus their text; nothing is used to train models under the API terms.
+  Check the Console's data-retention settings if a client set is under NDA.
+
+## 9. Running a takeoff
+1. **Job** — name, code (seeds the GUIDs; keep it for the life of the job), building, revision, bid due.
+2. **Drawings** — add every PDF you have: structural, architectural, mechanical / electrical / plumbing, civil,
+   the project manual. Nothing is "reference only" until the app has looked at it.
+3. **Output folder** — blank writes into a `Bohling Takeoff` folder next to the first PDF (the same place the
+   session deliverables go on the U: drive).
+4. **Job notes** — anything the reader must know up front ("base bid + Alt 1 only", "all steel galvanized per
+   addendum 2", "ignore the Phase 2 wing").
+5. **Run takeoff.** The log shows each stage: index (every page classified), notes (grades / finish rules),
+   columns (schedule + foundation plan), framing (one call per framing sheet, with the app's own geometry pass
+   on vector pages: grid-bubble calibration, label-to-line matching, measured lengths), details (one call per
+   details / arch / MEP / civil sheet, full page plus four zoomed quarters), synthesis (RFI log, scope, Summary
+   blocks). Then the deliverables are built and the IFC is checked.
+
+## 10. Reviewing in Excel
+The draft workbook is the takeoff of record — open it and work through it the way you would a session's
+workbook:
+* every row that depended on something the reader could not settle carries a **BSI-xx** code in its RFI column
+  and appears in the Summary FLAGS table; the INTERNAL RFI log lists the exposure in lb;
+* rows marked **WEIGHT NOT RESOLVED** are sizes the AISC lookup did not recognise — fix the size spelling or
+  type the lb/ft;
+* Detail Register items showing **NOT YET APPLIED** are details the reader found but could not count from the
+  plans — type the quantity (yellow cell);
+* the Finish Summary VARIANCE must read 0 and the Beam Detail check must say ✓ before anything goes out.
+Then *Build documents + model from an edited workbook*: pick the edited workbook (and its `_takeoff.json`,
+found automatically when it sits beside it). The IFC is rebuilt from your edited Model Geometry tab; the RFI log
+and scope letter are re-issued from the takeoff JSON.
+
+## 11. What the reader will and won't do
+It follows the Bohling rules (`docs/BSI_STANDARDS.md`): count everything, no estimating, column length T/FTG
+→ T/STL, slope correction, every sheet and every detail reviewed, standing scope calls, priority-coded RFIs in
+confirm-or-correct wording. It does not know your precedents on a particular owner / architect unless you put
+them in the job notes, and it cannot read what is not legible — those come back as RFIs, not guesses. Raster
+(scanned) sheets get no geometry pass; members on them are read from the image and should be spot-checked.
+
+## 12. Command line
+```
+BSI_Model_Builder_cli takeoff run S.pdf A.pdf M.pdf --job "Job name" --code CODE --out "U:\…\Bohling Takeoff" [--model …] [--notes "…"]
+BSI_Model_Builder_cli takeoff docs --xlsx Job_Takeoff.xlsx --json Job_takeoff.json      # after the Excel review
+BSI_Model_Builder_cli takeoff deliver --json Job_takeoff.json                            # rebuild everything from the JSON
+BSI_Model_Builder_cli takeoff run … --mock tests\data\mock_responses                     # replay canned answers (no API)
+```

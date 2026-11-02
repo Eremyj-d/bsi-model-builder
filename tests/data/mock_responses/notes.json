@@ -1,0 +1,34 @@
+{
+ "grades": {
+  "W": "A992",
+  "HSS": "A500 Gr.C",
+  "plates": "A572 Gr.50",
+  "angles": "A572 Gr.50",
+  "channels": "",
+  "anchor_rods": "F1554 Gr.55",
+  "bolts": "A325-N",
+  "pipe": ""
+ },
+ "finish": {
+  "interior": "Primed",
+  "exterior": "Galv",
+  "anchor_rods": "Galv",
+  "galvanize_rule": "exterior exposed steel hot-dip galvanized",
+  "primer": "SSPC-SP2 shop primer",
+  "aess": ""
+ },
+ "connection_design": "standard details per S501; A325-N bearing bolts",
+ "deck": "1 1/2\" x 22 ga Type B by others",
+ "joists": "none",
+ "notes": [
+  {
+   "sheet": "S001",
+   "text": "W shapes A992; HSS A500 Gr.C; plates and angles A572 Gr.50; anchor rods F1554 Gr.55; bolts A325-N."
+  },
+  {
+   "sheet": "S001",
+   "text": "Exterior exposed steel hot-dip galvanized; interior steel shop primed SSPC-SP2."
+  }
+ ],
+ "rfis": []
+}

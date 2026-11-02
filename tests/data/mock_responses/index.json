@@ -1,0 +1,46 @@
+{
+ "set_description": "Permit set 11/01/2026 \u2014 S001, S101, S102, S501 (synthetic sample)",
+ "parties": {
+  "owner": "Sample Owner LLC",
+  "architect": "Sample Architects",
+  "ser": "Sample Structural Engineers",
+  "gc": "",
+  "site": "100 Example Rd, Lynchburg, VA",
+  "bid_due": "",
+  "job": "Sample Shell Building"
+ },
+ "sheets": [
+  {
+   "number": "S001",
+   "title": "General Notes",
+   "kind": "general_notes",
+   "steel": "N",
+   "why": "grades / finish / bolts",
+   "page": 0
+  },
+  {
+   "number": "S101",
+   "title": "Foundation Plan & Column Schedule",
+   "kind": "column_schedule",
+   "steel": "Y",
+   "why": "6 columns, base plates, anchor rods",
+   "page": 1
+  },
+  {
+   "number": "S102",
+   "title": "Roof Framing Plan",
+   "kind": "framing_plan",
+   "steel": "Y",
+   "why": "W12 / W16 roof framing",
+   "page": 2
+  },
+  {
+   "number": "S501",
+   "title": "Typical Details",
+   "kind": "sections_details",
+   "steel": "Y",
+   "why": "base plate, cap plate, shear tab details",
+   "page": 3
+  }
+ ]
+}
