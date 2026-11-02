@@ -1,0 +1,24 @@
+MARK,PIECE,TYPE,SIZE,GRADE,FINISH,SHEET,GRID,LEVEL,X1,Y1,Z1,X2,Y2,Z2,ROT,CP,LB_FT,LBS,RFI,NOTES
+C1,1,COLUMN,W8x35,A992,Primed,S112,1/A,"T/FTG -2'-0"" to T/STL 14'-10""",0,0,-2,0,0,14.8333,0,5,35,,,
+C1,2,COLUMN,W8x35,A992,Primed,S112,2/A,"T/FTG -2'-0"" to T/STL 14'-10""",25,0,-2,25,0,14.8333,0,5,35,,,
+C1,3,COLUMN,W8x35,A992,Primed,S112,3/A,"T/FTG -2'-0"" to T/STL 14'-10""",50,0,-2,50,0,14.8333,0,5,35,,,
+C2,1,COLUMN,W8x35,A992,Primed,S112,1/B,"T/FTG -2'-0"" to T/STL 16'-6""",0,30,-2,0,30,16.5,90,5,35,,,web rotated 90
+C2,2,COLUMN,HSS9.625x.500,A500 Gr.C,Primed,S112,2/B,"T/FTG -2'-0"" to T/STL 16'-6""",25,30,-2,25,30,16.5,0,5,48.77,,BSI-02,round column
+C2,3,COLUMN,W8x35,A992,Primed,S112,3/B,"T/FTG -2'-0"" to T/STL 16'-6""",50,30,-2,50,30,16.5,90,5,35,,,
+B1,1,BEAM,W14x38,A992,Primed,S131,A/1-2,"T/STL 14'-10""",0,0,14.8333,25,0,14.8333,0,8,38,,,grid A spandrel
+B1,2,BEAM,W14x38,A992,Primed,S131,A/2-3,"T/STL 14'-10""",25,0,14.8333,50,0,14.8333,0,8,38,,,
+B2,1,BEAM,W14x38,A992,Primed,S131,B/1-2,"T/STL 16'-6""",0,30,16.5,25,30,16.5,0,8,38,,,
+B2,2,BEAM,W14x38,A992,Primed,S131,B/2-3,"T/STL 16'-6""",25,30,16.5,50,30,16.5,0,8,38,,,
+G1,1,GIRDER,HSS12x10x1/2,A500 Gr.C,Primed,S131,1/A-B,"sloped 14'-10"" to 16'-6""",0,0,14.8333,0,30,16.5,0,8,69.27,,,sloped N-S girder
+G1,2,GIRDER,HSS12x10x1/2,A500 Gr.C,Primed,S131,2/A-B,"sloped 14'-10"" to 16'-6""",25,0,14.8333,25,30,16.5,0,8,69.27,,,
+G1,3,GIRDER,HSS12x10x1/2,A500 Gr.C,Primed,S131,3/A-B,"sloped 14'-10"" to 16'-6""",50,0,14.8333,50,30,16.5,0,8,69.27,,,
+BR1,1,BRACE,L3x3x1/4,A572 Gr.50,Galv,S301,1/A-B,,0,0,0,0,30,16.5,0,5,4.9,,,diagonal brace end wall
+P1,1,POST,HSS6x6x3/8,A500 Gr.C,Galv,S131,canopy,"T/SLAB 0'-0"" to 10'-0""",60,15,0,60,15,10,0,5,27.48,,,
+B3,1,BEAM,HSS10x5x5/16,A500 Gr.C,Galv,S131,canopy,"T/STL 10'-0""",50,15,10,60,15,10,0,8,29.72,,,canopy outrigger
+GT1,1,GIRT,C8x11.5,A992,Galv,S301,A/1-2,,0,0,7.5,25,0,7.5,0,5,11.5,,,girt web horizontal
+BP-A,1,PLATE,PL 1x12x12,A572 Gr.50,Galv,S501,1/A,"T/FTG -2'-0""",0,0,-2,,,,0,,,40.8,,base plate
+BP-A,2,PLATE,PL 1x12x12,A572 Gr.50,Galv,S501,2/A,"T/FTG -2'-0""",25,0,-2,,,,0,,,40.8,,base plate
+BP-A,3,PLATE,PL 1x12x12,A572 Gr.50,Galv,S501,3/A,"T/FTG -2'-0""",50,0,-2,,,,0,,,40.8,,base plate
+BP-A,4,PLATE,PL 1x12x12,A572 Gr.50,Galv,S501,1/B,"T/FTG -2'-0""",0,30,-2,,,,90,,,40.8,,base plate
+BP-A,5,PLATE,PL 1x12x12,A572 Gr.50,Galv,S501,2/B,"T/FTG -2'-0""",25,30,-2,,,,0,,,40.8,,base plate
+BP-A,6,PLATE,PL 1x12x12,A572 Gr.50,Galv,S501,3/B,"T/FTG -2'-0""",50,30,-2,,,,90,,,40.8,,base plate

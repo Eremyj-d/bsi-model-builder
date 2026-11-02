@@ -1,0 +1,35 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "bsi-model-builder"
+version = "0.1.0"
+description = "Bohling Steel takeoff geometry -> IFC structural steel model (Tekla PowerFab / detailer handoff)"
+readme = "README.md"
+requires-python = ">=3.11,<3.14"
+license = {text = "Proprietary - Bohling Steel, Inc. internal tool"}
+authors = [{name = "Jeremy Davis, Estimator — Bohling Steel, Inc."}]
+dependencies = [
+  "ifcopenshell>=0.8.1,<1.0",
+  "openpyxl>=3.1",
+  "numpy>=1.26",
+  "matplotlib>=3.8",
+  "pillow>=10",
+  "pytest>=8",
+]
+
+[project.optional-dependencies]
+dev = ["pyinstaller>=6.10"]
+
+[project.scripts]
+bsi-model-builder = "bsi_model_builder.__main__:main"
+
+[tool.setuptools.packages.find]
+include = ["bsi_model_builder*"]
+
+[tool.setuptools.package-data]
+bsi_model_builder = ["data/aisc/*.csv", "data/aisc/*.txt", "data/selftest/*", "ui/*.ico", "ui/*.png"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]

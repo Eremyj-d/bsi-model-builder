@@ -1,0 +1,52 @@
+{
+ "job": "Phoenix \u2014 364 Exide Drive Bristol TN \u2014 Basement Floor Supports",
+ "job_code": "PHXBRISTOL",
+ "building": "",
+ "rev": "REV 1 takeoff (10/30/2026) \u2014 model REV 0",
+ "date": "2026-10-30",
+ "source": "Phoenix_BristolTN_BasementFloorSupports_Takeoff.xlsx REV 1 (10/30/2026); Bundy A&E 26066 sheet rev 10/29/26 ADD END COLUMNS AND BM POCKETS",
+ "datum": {
+  "description": "Origin = WEST wall inside face / SOUTH wall inside face at TOP OF FOOTING (bottom of base plate) = 0'-0\". +X east (stations from the west wall inside face, as on the sheet), +Y north, +Z up. Building 432'-5 3/4\" x 120'-2 3/4\" inside faces. Beam-line Y positions scaled off the 1/16\" plan (\u00b13\"): L1 13'-8\" from the north wall, L2 43'-9\" from the north wall, L3 74'-6\" from the north wall, L4 105'-2 1/2\" from the north wall. Post 20'-0\" (BSI-01) + 3/4\" base PL + 3/4\" cap PL \u2192 beam bottom 20'-1 1/2\", T/STL 22'-1 3/8\" (W24x76 d = 23.9\")."
+ },
+ "grids": {
+  "X": {
+   "P01": 10.75,
+   "P02": 31.5521,
+   "P03": 52.3542,
+   "P04": 73.1562,
+   "P05": 93.9583,
+   "P06": 114.7604,
+   "P07": 135.5625,
+   "P08": 156.3646,
+   "P09": 177.1667,
+   "P10": 197.9688,
+   "P11": 218.7708,
+   "P12": 239.5729,
+   "P13": 260.375,
+   "P14": 281.1771,
+   "P15": 301.9792,
+   "P16": 322.7812,
+   "P17": 343.5833,
+   "P18": 364.3854,
+   "P19": 385.1875,
+   "P20": 405.9896,
+   "P21": 426.7917
+  },
+  "Y": {
+   "L1": 106.5625,
+   "L2": 76.4792,
+   "L3": 45.7292,
+   "L4": 15.0208
+  }
+ },
+ "storeys": [
+  {
+   "name": "T/FTG 0'-0\" (post base)",
+   "elev_ft": 0.0
+  },
+  {
+   "name": "T/STL 22'-1 3/8\" (W24x76)",
+   "elev_ft": 22.1167
+  }
+ ]
+}

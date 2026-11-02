@@ -1,0 +1,65 @@
+name: build
+
+on:
+  push:
+    branches: [main]
+    tags: ["v*"]
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  test:
+    name: tests (${{ matrix.os }})
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+      - run: python -m pip install --upgrade pip
+      - run: pip install -r requirements.txt
+      - run: python -m pytest -q
+      - run: python -m bsi_model_builder selftest
+
+  windows-exe:
+    name: Windows app
+    needs: test
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+      - run: python -m pip install --upgrade pip
+      - run: pip install -r requirements.txt pyinstaller
+      - name: Build with PyInstaller
+        run: pyinstaller --noconfirm --clean packaging/BSI_Model_Builder.spec
+      - name: Smoke-test the frozen app (console twin)
+        shell: pwsh
+        run: |
+          .\dist\BSI_Model_Builder\BSI_Model_Builder_cli.exe --version
+          .\dist\BSI_Model_Builder\BSI_Model_Builder_cli.exe selftest --out selftest_out
+          if ($LASTEXITCODE -ne 0) { exit 1 }
+          Get-ChildItem selftest_out
+      - name: Zip
+        shell: pwsh
+        run: |
+          $v = (python -c "import bsi_model_builder; print(bsi_model_builder.__version__)")
+          Compress-Archive -Path dist\BSI_Model_Builder\* -DestinationPath "BSI_Model_Builder_v$v`_win64.zip"
+          "ZIP=BSI_Model_Builder_v$v`_win64.zip" | Out-File -FilePath $env:GITHUB_ENV -Append
+      - uses: actions/upload-artifact@v4
+        with:
+          name: BSI_Model_Builder_win64
+          path: ${{ env.ZIP }}
+      - name: Release (on tag)
+        if: startsWith(github.ref, 'refs/tags/v')
+        uses: softprops/action-gh-release@v2
+        with:
+          files: ${{ env.ZIP }}
+          generate_release_notes: true
