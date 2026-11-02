@@ -36,9 +36,17 @@ def new_job(name: str = "", code: str = "", rev: str = "REV 0", source: str = ""
 
 
 def code_from_name(name: str) -> str:
-    words = re.findall(r"[A-Za-z0-9]+", name or "")
-    code = "".join(w[:4].upper() for w in words[:3])
-    return code[:12] or "JOB"
+    """'Newport News Seafood Market' -> NNSM, 'Phoenix Bristol' -> PHOENIBRIS, 'Mirada' -> MIRADA"""
+    words = [w for w in re.findall(r"[A-Za-z0-9]+", name or "") if w.lower() not in ("the", "of", "and", "at", "a", "an", "for")]
+    if not words:
+        return "JOB"
+    if len(words) >= 3:
+        code = "".join(w[0] for w in words)
+    elif len(words) == 2:
+        code = words[0][:6] + words[1][:4]
+    else:
+        code = words[0][:10]
+    return code.upper()[:12]
 
 
 def validate_job(job: dict) -> list[str]:

@@ -1,0 +1,171 @@
+{
+ "columns": [
+  {
+   "mark": "C1-1",
+   "size": "HSS6x6x3/8",
+   "grid": "1/A",
+   "x_ft": 0,
+   "y_ft": 0,
+   "tftg_ft": -2.0,
+   "tstl_ft": 14.0,
+   "height_ft": 16.0,
+   "base_plate": "PL 3/4x12x12",
+   "anchors": "(4) 3/4\" dia x 1'-6\"",
+   "rotation_deg": 0,
+   "finish": "Primed",
+   "grade": "A500 Gr.C",
+   "notes": "per S101 schedule",
+   "sheet": "S101",
+   "rfi": [],
+   "allowance": false
+  },
+  {
+   "mark": "C1-2",
+   "size": "HSS6x6x3/8",
+   "grid": "2/A",
+   "x_ft": 25,
+   "y_ft": 0,
+   "tftg_ft": -2.0,
+   "tstl_ft": 14.0,
+   "height_ft": 16.0,
+   "base_plate": "PL 3/4x12x12",
+   "anchors": "(4) 3/4\" dia x 1'-6\"",
+   "rotation_deg": 0,
+   "finish": "Primed",
+   "grade": "A500 Gr.C",
+   "notes": "per S101 schedule",
+   "sheet": "S101",
+   "rfi": [],
+   "allowance": false
+  },
+  {
+   "mark": "C1-3",
+   "size": "HSS6x6x3/8",
+   "grid": "3/A",
+   "x_ft": 50,
+   "y_ft": 0,
+   "tftg_ft": -2.0,
+   "tstl_ft": 14.0,
+   "height_ft": 16.0,
+   "base_plate": "PL 3/4x12x12",
+   "anchors": "(4) 3/4\" dia x 1'-6\"",
+   "rotation_deg": 0,
+   "finish": "Primed",
+   "grade": "A500 Gr.C",
+   "notes": "per S101 schedule",
+   "sheet": "S101",
+   "rfi": [],
+   "allowance": false
+  },
+  {
+   "mark": "C2-4",
+   "size": "HSS6x6x1/2",
+   "grid": "1/B",
+   "x_ft": 0,
+   "y_ft": 30,
+   "tftg_ft": -2.0,
+   "tstl_ft": 15.5,
+   "height_ft": 17.5,
+   "base_plate": "PL 3/4x12x12",
+   "anchors": "(4) 3/4\" dia x 1'-6\"",
+   "rotation_deg": 0,
+   "finish": "Primed",
+   "grade": "A500 Gr.C",
+   "notes": "per S101 schedule",
+   "sheet": "S101",
+   "rfi": [
+    "c2-height"
+   ],
+   "allowance": false
+  },
+  {
+   "mark": "C2-5",
+   "size": "HSS6x6x1/2",
+   "grid": "2/B",
+   "x_ft": 25,
+   "y_ft": 30,
+   "tftg_ft": -2.0,
+   "tstl_ft": 15.5,
+   "height_ft": 17.5,
+   "base_plate": "PL 3/4x12x12",
+   "anchors": "(4) 3/4\" dia x 1'-6\"",
+   "rotation_deg": 0,
+   "finish": "Primed",
+   "grade": "A500 Gr.C",
+   "notes": "per S101 schedule",
+   "sheet": "S101",
+   "rfi": [
+    "c2-height"
+   ],
+   "allowance": false
+  },
+  {
+   "mark": "C2-6",
+   "size": "HSS6x6x1/2",
+   "grid": "3/B",
+   "x_ft": 50,
+   "y_ft": 30,
+   "tftg_ft": -2.0,
+   "tstl_ft": 15.5,
+   "height_ft": 17.5,
+   "base_plate": "PL 3/4x12x12",
+   "anchors": "(4) 3/4\" dia x 1'-6\"",
+   "rotation_deg": 0,
+   "finish": "Primed",
+   "grade": "A500 Gr.C",
+   "notes": "per S101 schedule",
+   "sheet": "S101",
+   "rfi": [
+    "c2-height"
+   ],
+   "allowance": false
+  }
+ ],
+ "base_plates": [
+  {
+   "mark": "BP-A",
+   "size": "PL 3/4x12x12",
+   "qty": 6,
+   "finish": "Primed",
+   "grade": "A572 Gr.50",
+   "source": "S501 det. 1",
+   "rfi": []
+  }
+ ],
+ "plate_washers": [
+  {
+   "size": "PL 3/8x3x3",
+   "qty": 24,
+   "finish": "Galv",
+   "source": "S501 det. 1"
+  }
+ ],
+ "anchor_groups": [
+  {
+   "group": "Column ABs",
+   "location": "6 columns",
+   "member": "HSS6x6",
+   "diameter": "3/4\"",
+   "per_item": 4,
+   "item_qty": 6,
+   "length": "1'-6\"",
+   "finish": "Galv",
+   "grade": "F1554 Gr.55",
+   "notes": "per S501 det. 1",
+   "rfi": [],
+   "allowance": false
+  }
+ ],
+ "datum": "grid 1 / grid A at T/SLAB 0'-0\"; T/FTG -2'-0\" per the schedule",
+ "rfis": [
+  {
+   "key": "c2-height",
+   "priority": "P1",
+   "to": "SER",
+   "subject": "C2 column height",
+   "question": "Column schedule shows C2 T/STL 15'-6\" at grid B \u2014 confirm or correct; carried 15'-6\".",
+   "carried": "3 x HSS6x6x1/2 at 17'-6\" T/FTG to T/STL",
+   "exposure_lbs": 53
+  }
+ ]
+}

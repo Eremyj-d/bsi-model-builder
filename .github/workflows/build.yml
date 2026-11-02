@@ -47,6 +47,10 @@ jobs:
           .\dist\BSI_Model_Builder\BSI_Model_Builder_cli.exe selftest --out selftest_out
           if ($LASTEXITCODE -ne 0) { exit 1 }
           Get-ChildItem selftest_out
+          python -m tests.synth.make_drawings synth_out
+          .\dist\BSI_Model_Builder\BSI_Model_Builder_cli.exe takeoff run synth_out\SAMPLE_Structural.pdf --job "Sample Shell Building" --code SAMPLE --out takeoff_out --mock tests\data\mock_responses
+          if ($LASTEXITCODE -ne 0) { exit 1 }
+          Get-ChildItem takeoff_out
       - name: Zip
         shell: pwsh
         run: |

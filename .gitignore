@@ -7,3 +7,6 @@ dist/
 *.egg-info/
 /out/
 /packaging/shots/
+docs/reference_GMU_takeoff.xlsx
+# reference workbook is a real job file — kept local, not committed
+packaging/doc_previews/*.pdf

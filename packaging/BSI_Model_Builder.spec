@@ -5,7 +5,7 @@ from PyInstaller.utils.hooks import collect_all, collect_submodules
 
 ROOT = os.path.abspath(os.path.join(SPECPATH, ".."))
 datas, binaries, hiddenimports = [], [], []
-for pkg in ("ifcopenshell", "matplotlib", "PIL", "numpy", "openpyxl"):
+for pkg in ("ifcopenshell", "matplotlib", "PIL", "numpy", "openpyxl", "docx", "pymupdf", "anthropic", "keyring", "certifi"):
     d, b, h = collect_all(pkg)
     datas += d; binaries += b; hiddenimports += h
 hiddenimports += collect_submodules("bsi_model_builder") + ["_pytest", "_pytest.assertion", "_pytest.assertion.rewrite", "pytest"]
@@ -13,7 +13,9 @@ datas += [
     (os.path.join(ROOT, "bsi_model_builder", "data"), os.path.join("bsi_model_builder", "data")),
     (os.path.join(ROOT, "bsi_model_builder", "ui", "app_icon.png"), os.path.join("bsi_model_builder", "ui")),
     (os.path.join(ROOT, "bsi_model_builder", "ui", "app_icon.ico"), os.path.join("bsi_model_builder", "ui")),
+    (os.path.join(ROOT, "bsi_model_builder", "takeoff", "prompts"), os.path.join("bsi_model_builder", "takeoff", "prompts")),
 ]
+hiddenimports += ["keyring.backends.Windows", "keyring.backends.SecretService", "keyring.backends.chainer", "keyring.backends.fail", "win32ctypes.pywin32", "pymupdf", "fitz"]
 block_cipher = None
 
 a = Analysis([os.path.join(ROOT, "packaging", "launcher.py")],

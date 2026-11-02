@@ -1,0 +1,78 @@
+{
+ "rfis": [
+  {
+   "code": "BSI-01",
+   "key": "c2-height",
+   "priority": "P1",
+   "to": "SER",
+   "subject": "C2 column height",
+   "question": "Column schedule shows C2 T/STL 15'-6\" \u2014 confirm or correct; carried 15'-6\" (17'-6\" T/FTG to T/STL).",
+   "carried": "3 x HSS6x6x1/2 at 17'-6\"",
+   "status": "OPEN",
+   "where_flagged": "Column Tonnage: C2-4..C2-6; Model Geometry",
+   "exposure_lbs": 53
+  },
+  {
+   "code": "BSI-02",
+   "key": "sloped-girders",
+   "priority": "P2",
+   "to": "SER",
+   "subject": "Sloped girders",
+   "question": "W16x31 girders A\u2192B slope 1/2\":12 \u2014 confirm sloped (not stepped); carried slope-corrected 30'-0 3/8\".",
+   "carried": "3 x W16x31 at 30'-0 3/8\"",
+   "status": "OPEN",
+   "where_flagged": "Beam Detail: B5-B7",
+   "exposure_lbs": 0
+  }
+ ],
+ "inclusions": [
+  "Columns HSS6x6 + base plates + anchor rods",
+  "Roof beams W12 / W16",
+  "Misc Parts \u2014 base plates, cap plates, shear tabs",
+  "Field bolts A325-N"
+ ],
+ "exclusions": [
+  "Steel roof deck (memo)",
+  "CMU / concrete / masonry",
+  "Field painting"
+ ],
+ "assumptions": [
+  "Roof deck by others (memo only)"
+ ],
+ "galv_unquantified": [],
+ "scope_summary": "Structural steel for a one-story shell: six HSS6x6 columns on base plates, W12x26 spandrels, W16x31 sloped girders and W12x19 infill at 6'-3\" o.c., cap plates and shear tabs per S501.",
+ "scope": {
+  "inclusions": [
+   "Furnish and erect structural steel per S101, S102, S501",
+   "Anchor rods and setting templates",
+   "Field bolts"
+  ],
+  "exclusions": [
+   "Roof deck",
+   "CMU, concrete, masonry",
+   "Field painting and fireproofing"
+  ],
+  "clarifications": [
+   "Column heights per the S101 schedule pending BSI-01",
+   "Girders carried sloped per BSI-02"
+  ],
+  "quantities": [
+   {
+    "item": "Columns HSS6x6",
+    "quantity": "6",
+    "unit": "each"
+   },
+   {
+    "item": "Roof beams W12 / W16",
+    "quantity": "14",
+    "unit": "each"
+   },
+   {
+    "item": "Anchor rods 3/4\"",
+    "quantity": "24",
+    "unit": "each"
+   }
+  ],
+  "tonnage_statement": "Approximately 6.7 tons of fabricated structural steel (6 columns, 14 beams)."
+ }
+}

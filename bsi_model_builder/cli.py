@@ -68,6 +68,52 @@ def cmd_template(a) -> int:
     return 0
 
 
+def cmd_takeoff(a) -> int:
+    """takeoff run --job NAME --code CODE --out DIR PDF [PDF …]   |   takeoff docs --xlsx EDITED.xlsx --json X_takeoff.json"""
+    from .takeoff.model import Header
+    if a.sub == "run":
+        from .takeoff.engine import run_takeoff
+        from .takeoff.outputs import build_deliverables
+        if a.mock:
+            from .takeoff.providers import MockProvider
+            provider = MockProvider(a.mock)
+        else:
+            from .takeoff.credentials import get_api_key
+            from .takeoff.providers import AnthropicProvider, DEFAULT_MODEL
+            key = a.api_key or get_api_key()
+            if not key:
+                print("no API key: set one in the app, pass --api-key, or set ANTHROPIC_API_KEY"); return 2
+            provider = AnthropicProvider(key, model=a.model or DEFAULT_MODEL, cache_dir=os.path.join(a.out, ".api_cache"))
+        from .core.jobfile import code_from_name
+        h = Header(job=a.job, job_code=a.code or code_from_name(a.job), rev=a.rev or "REV 0", building=a.building or "")
+        res = run_takeoff(a.pdfs, h, provider, a.out, progress=_progress, job_notes=a.notes or "")
+        for e in res.errors:
+            print("WARN", e.splitlines()[0])
+        paths = build_deliverables(res.takeoff, a.out, h.job_code, progress=_progress)
+        for k, v in paths.items():
+            if isinstance(v, str):
+                print(f"  {k:14s} {v}")
+        print(f"API cost ≈ ${res.cost:.2f}")
+        return 0 if not res.errors else 1
+    if a.sub == "docs":
+        from .takeoff.outputs import build_from_workbook
+        paths = build_from_workbook(a.xlsx, a.json, a.out or os.path.dirname(a.xlsx), progress=_progress)
+        for k, v in paths.items():
+            if isinstance(v, str):
+                print(f"  {k:14s} {v}")
+        return 0
+    if a.sub == "deliver":
+        from .takeoff.model import Takeoff
+        from .takeoff.outputs import build_deliverables
+        t = Takeoff.from_json(a.json)
+        paths = build_deliverables(t, a.out or os.path.dirname(a.json), progress=_progress)
+        for k, v in paths.items():
+            if isinstance(v, str):
+                print(f"  {k:14s} {v}")
+        return 0
+    return 2
+
+
 def cmd_selftest(a) -> int:
     from .core.pipeline import run
     from .selftest import sample_paths
@@ -99,6 +145,14 @@ def main(argv=None) -> int:
     t.set_defaults(fn=cmd_template)
     s = sub.add_parser("selftest", help="build + check the bundled synthetic frame"); s.add_argument("--out")
     s.set_defaults(fn=cmd_selftest)
+    tk = sub.add_parser("takeoff", help="drawings → workbook + docs + model (Claude API)")
+    tks = tk.add_subparsers(dest="sub")
+    r = tks.add_parser("run"); r.add_argument("pdfs", nargs="+"); r.add_argument("--job", required=True); r.add_argument("--code"); r.add_argument("--building")
+    r.add_argument("--rev"); r.add_argument("--out", required=True); r.add_argument("--model"); r.add_argument("--api-key"); r.add_argument("--notes")
+    r.add_argument("--mock", help="replay canned responses from this folder instead of calling the API (tests)")
+    dd = tks.add_parser("docs", help="rebuild docs + model from an edited workbook"); dd.add_argument("--xlsx", required=True); dd.add_argument("--json", required=True); dd.add_argument("--out")
+    dl = tks.add_parser("deliver", help="rebuild everything from a takeoff JSON"); dl.add_argument("--json", required=True); dl.add_argument("--out")
+    tk.set_defaults(fn=cmd_takeoff)
     a = ap.parse_args(argv)
     if not a.cmd:
         ap.print_help(); return 0

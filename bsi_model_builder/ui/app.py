@@ -68,11 +68,18 @@ class App(tk.Tk):
     def _build(self):
         top = ttk.Frame(self, padding=(12, 10, 12, 4)); top.pack(fill="x")
         ttk.Label(top, text=__app_name__, style="Title.TLabel").pack(side="left")
-        ttk.Label(top, text="   takeoff geometry → IFC model for Tekla PowerFab and the detailer", style="Sub.TLabel").pack(side="left", pady=(6, 0))
+        ttk.Label(top, text="   drawings → takeoff workbook, RFI log, scope letter, IFC model for Tekla PowerFab and the detailer", style="Sub.TLabel").pack(side="left", pady=(6, 0))
         ttk.Button(top, text="Help", command=self._help).pack(side="right")
 
-        body = ttk.Panedwindow(self, orient="horizontal"); body.pack(fill="both", expand=True, padx=12, pady=6)
-        left = ttk.Frame(body, padding=(0, 0, 8, 0), width=470); right = ttk.Frame(body)
+        self.pages = ttk.Notebook(self); self.pages.pack(fill="both", expand=True, padx=12, pady=6)
+        model_page = ttk.Frame(self.pages); self.pages.add(model_page, text="  Model (geometry → IFC)  ")
+        try:
+            from .takeoff_tab import TakeoffTab
+            self.takeoff = TakeoffTab(self.pages, self); self.pages.add(self.takeoff, text="  Takeoff (drawings → workbook + docs + IFC)  ")
+        except Exception as ex:   # pragma: no cover
+            self.takeoff = None; print("takeoff page unavailable:", ex)
+        body = ttk.Panedwindow(model_page, orient="horizontal"); body.pack(fill="both", expand=True)
+        left = ttk.Frame(body, padding=(0, 6, 8, 0), width=470); right = ttk.Frame(body)
         body.add(left, weight=0); body.add(right, weight=1)
         self.after(50, lambda: body.sashpos(0, 480))
 
@@ -146,6 +153,8 @@ class App(tk.Tk):
     def _save_settings(self):
         self.settings.update({"job": self.v_job.get(), "geom": self.v_geom.get(), "out": self.v_out.get(),
                               "tab": self.v_tab.get(), "geometry": self.geometry()})
+        if getattr(self, "takeoff", None):
+            self.takeoff.save_settings()
         settings.save(self.settings)
 
     def _close(self):
@@ -329,7 +338,7 @@ class App(tk.Tk):
             open_path(self.result.ifc)
 
     def _help(self):
-        self.nb.select(3)
+        self.pages.select(0); self.nb.select(3)
 
 
 ABOUT_TEXT = f"""{__app_name__} {__version__}
@@ -367,9 +376,10 @@ SCOPE
   Main members and the plates that sit at a known place on a member (base, cap, bearing). Connection
   plates, anchor rods and bolts stay in the workbook / manual-entry list.
 
-PHASE 2 (planned)
-  Takeoff from drawings inside this app through the Claude API — drawings in, workbook + Model Geometry out,
-  estimator review, then Build. Not in this release.
+TAKEOFF PAGE (0.2)
+  Drawings in → 12-tab takeoff workbook + RFI log (+ INTERNAL) + PRELIMINARY scope letter + takeoff notes +
+  IFC model, through the Claude API with your own key (console.anthropic.com; stored in Windows Credential
+  Manager). Review the draft in Excel, then rebuild the model and documents from the edited workbook.
 
 Built with ifcopenshell, openpyxl, numpy, matplotlib. AISC Shapes Database v16.0 data via the Apache-2.0
 steelpy package.
