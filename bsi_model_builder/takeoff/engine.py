@@ -24,6 +24,16 @@ from .model import *
 from ..core.aisc_profiles import resolve
 
 _PROMPTS = os.path.join(os.path.dirname(os.path.abspath(__file__)), "prompts")
+
+# A "spec book" = a PDF with many text-only pages (a project manual). It is not listed page by page: the app
+# scans it locally for the steel-relevant sections and feeds only those pages to the notes stage.
+SPEC_BOOK_MIN_PAGES = 60
+SPEC_KEYWORDS = ("SECTION 05", "DIVISION 05", "DIVISION 5", "STRUCTURAL STEEL", "METAL FABRICATION", "STEEL JOIST", "STEEL DECK",
+                 "ARCHITECTURAL METAL", "GALVANIZ", "051200", "052100", "053100", "055000", "055100", "055119", "051213", "ANCHOR ROD", "AISC")
+# Steel-relevant words for architectural / MEP / civil pages: a page whose text has none of these is logged as
+# reviewed (no steel) without an API call. Raster pages (no text) always go to the model.
+STEEL_WORDS = re.compile(r"\b(STEEL|LINTEL|ANGLE|HSS|W\d{1,2}X\d+|C\d{1,2}X\d+|L\d{1,2}X\d+|PL\s?\d+|PLATE|LADDER|RAIL(ING)?|GUARD|BOLLARD|STAIR|STRINGER|SHELF|EMBED|ANCHOR|"
+                         r"CURB|RTU|FRAME|CANOPY|GATE|GRATING|CHANNEL|TUBE|PIPE\s?\d|BENT PL|KICKER|POUR STOP|GALV|WELD|BRACKET|SUPPORT)\b", re.I)
 PLAN_KINDS = {"foundation_plan", "column_schedule", "framing_plan", "elevation"}
 DETAIL_KINDS = {"sections_details", "schedules", "arch_plan", "arch_elevation", "arch_section_detail", "mechanical", "civil", "plumbing", "electrical", "other"}
 NOTE_KINDS = {"general_notes", "specs", "cover_index"}
@@ -161,12 +171,48 @@ class Engine:
         return blocks
 
     # ------------------------------------------------------------------ stages
-    def stage_index(self, ds, t: Takeoff):
-        listing = ["IDX | FILE | DETECTED SHEET | TITLE | VECTOR | TEXT CHARS"]
+    def _find_spec_books(self, ds) -> dict[str, list[int]]:
+        """file -> page indexes, for PDFs that look like a project manual (many pages, text, no vector drawings)"""
+        by_file: dict[str, list] = {}
         for pg in ds.pages:
+            by_file.setdefault(pg.file, []).append(pg)
+        books = {}
+        for f, pgs in by_file.items():
+            if len(pgs) >= SPEC_BOOK_MIN_PAGES and sum(1 for p in pgs if p.has_vector) < 0.1 * len(pgs) and sum(1 for p in pgs if p.text_chars > 200) > 0.6 * len(pgs):
+                books[f] = [p.page_index for p in pgs]
+        return books
+
+    def _spec_pages(self, ds, pages: list[int]) -> list[int]:
+        """pages of a spec book that mention the steel sections (local keyword scan, no API)"""
+        hits = []
+        for i in pages:
+            try:
+                txt = " ".join(sp["text"] for sp in ds.page_text(i)).upper()
+            except Exception:
+                continue
+            if any(k in txt for k in SPEC_KEYWORDS):
+                hits.append(i)
+        return hits
+
+    def stage_index(self, ds, t: Takeoff):
+        books = self._find_spec_books(ds)
+        self.spec_pages: list[int] = []
+        for f, pgs in books.items():
+            hits = self._spec_pages(ds, pgs)
+            self.spec_pages += hits
+            self.say(f"  spec book {os.path.basename(f)}: {len(pgs)} pages, {len(hits)} with steel sections (scanned locally)")
+        book_pages = {i for pgs in books.values() for i in pgs}
+        listing = ["IDX | FILE | DETECTED SHEET | TITLE | VECTOR | TEXT CHARS"]
+        for f, pgs in books.items():
+            listing.append(f"{pgs[0]}-{pgs[-1]} | {os.path.basename(f)} | SPEC BOOK | project manual, {len(pgs)} pages — steel sections scanned locally, do not list page by page | N | -")
+        for pg in ds.pages:
+            if pg.page_index in book_pages:
+                continue
             listing.append(f"{pg.page_index} | {os.path.basename(pg.file)} | {pg.sheet_number or '?'} | {pg.sheet_title or ''} | {'Y' if pg.has_vector else 'N'} | {pg.text_chars}")
         blocks = [self._txt(prompt("index")), self._txt("\n".join(listing))]
         for pg in ds.pages:
+            if pg.page_index in book_pages:
+                continue
             txt = self._page_text(ds, pg.page_index, cap=1200)
             if txt:
                 blocks.append(self._txt(f"--- page {pg.page_index} text (head) ---\n{txt}"))
@@ -188,12 +234,18 @@ class Engine:
         return d
 
     def stage_notes(self, ds, t: Takeoff):
-        pages = [i for i, k in self.kinds.items() if k in NOTE_KINDS]
+        pages = [i for i, k in self.kinds.items() if k in NOTE_KINDS] + [i for i in getattr(self, "spec_pages", []) if i not in self.kinds]
         if not pages:
             return None
         blocks = [self._txt(prompt("notes"))]
+        budget = 160000                       # chars of page text per notes call (~40k tokens); spec pages are the long tail
         for i in pages:
-            blocks.append(self._txt(f"--- {ds.pages[i].sheet_number} {ds.pages[i].sheet_title} ---\n{self._page_text(ds, i)}"))
+            txt = self._page_text(ds, i, cap=min(40000, max(4000, budget)))
+            budget -= len(txt)
+            if budget < 0:
+                blocks.append(self._txt("… remaining spec pages omitted for length — raise an RFI if a section seems missing")); break
+            label = f"spec page {i}" if i in getattr(self, "spec_pages", []) else f"{ds.pages[i].sheet_number} {ds.pages[i].sheet_title}"
+            blocks.append(self._txt(f"--- {label} ---\n{txt}"))
         d = self._call("notes", blocks, "notes")
         self.grades = d.get("grades") or {}
         self.finish = d.get("finish") or {}
@@ -356,11 +408,22 @@ class Engine:
         ctx = (f"CONTEXT FROM THE OTHER STAGES: {sum(c.qty for c in t.columns)} columns ({', '.join(sorted({c.size for c in t.columns}))}); "
                f"{len(t.beams)} beams ({', '.join(sorted({b.size for b in t.beams}))}); connection counts {json.dumps(getattr(self, 'conn_counts', []))[:3000]}; "
                f"kits so far: {[k.title for k in t.kits]}; finish rules {json.dumps(self.finish)}; grades {json.dumps(self.grades)}")
+        skipped = 0
         for i in pages:
             pg = ds.pages[i]
             sheet = pg.sheet_number or f"p{i}"
             if any(s.page == i and s.steel == "N" for s in t.sheets):
                 self._mark_reviewed(t, i); continue
+            if self.kinds.get(i) not in ("sections_details", "schedules") and pg.text_chars > 200:
+                try:
+                    txt = " ".join(sp["text"] for sp in ds.page_text(i))
+                except Exception:
+                    txt = ""
+                if txt and not STEEL_WORDS.search(txt):
+                    for sh in t.sheets:
+                        if sh.page == i:
+                            sh.steel = "N"; sh.notes = (sh.notes + " — no steel words in the page text (local scan, no API call)").strip(" —")
+                    self._mark_reviewed(t, i); skipped += 1; continue
             blocks = [self._txt(prompt("details")), self._txt(ctx), self._txt(f"--- {sheet} {pg.sheet_title} (page {i}) — full page then 4 tiles ---"), self._img(ds, i, self.dpi)]
             blocks += self._tiles(ds, i)
             blocks.append(self._txt(f"page text:\n{self._page_text(ds, i, cap=30000)}"))
@@ -393,6 +456,8 @@ class Engine:
                 t.notes.append(NoteLine(sheet, n["text"]))
             self._draft(d.get("rfis"), sheet)
             self._mark_reviewed(t, i)
+        if skipped:
+            self.say(f"    {skipped} arch / MEP / civil page(s) skipped — no steel words in their text")
         # letter the kits: steel kits A, B, … ; no-steel kits collapse into one closing kit Z
         steel = [k for k in t.kits if not k.no_steel]; nos = [k for k in t.kits if k.no_steel]
         for n, k in enumerate(steel):
