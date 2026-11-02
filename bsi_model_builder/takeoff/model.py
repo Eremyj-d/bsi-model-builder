@@ -357,10 +357,11 @@ class Takeoff:
         """Beam Tonnage rows: one per (sheet, size, length to 1/8\", finish, grade)"""
         groups: dict[tuple, dict] = {}
         for b in self.beams:
-            key = (b.sheet, b.size.upper(), round(b.length_ft * 96) / 96, b.finish, b.grade)
-            g = groups.setdefault(key, {"sheet": b.sheet, "size": b.size, "length_ft": key[2], "lb_ft": b.lb_ft or 0,
-                                        "finish": b.finish, "grade": b.grade, "qty": 0, "lbs": 0.0, "notes": set(), "rfi": set(), "allowance": False})
-            g["qty"] += 1; g["lbs"] += b.lbs; g["allowance"] |= b.allowance
+            key = (b.sheet, b.size.upper(), round(b.length_ft * 96) / 96, b.finish, b.grade)   # group to 1/8"
+            g = groups.setdefault(key, {"sheet": b.sheet, "size": b.size, "length_ft": b.length_ft, "lb_ft": b.lb_ft or 0,
+                                        "finish": b.finish, "grade": b.grade, "qty": 0, "lbs": 0.0, "len_sum": 0.0, "notes": set(), "rfi": set(), "allowance": False})
+            g["qty"] += 1; g["lbs"] += b.lbs; g["len_sum"] += b.length_ft; g["allowance"] |= b.allowance
+            g["length_ft"] = g["len_sum"] / g["qty"]            # exact mean length, so qty × lb/ft × length ties to Beam Detail
             if b.note:
                 g["notes"].add(b.note)
             g["rfi"].update(b.rfi)

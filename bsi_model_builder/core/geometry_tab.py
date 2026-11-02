@@ -112,7 +112,7 @@ def add_model_geometry_tab(wb, job: dict, rows: list[dict], status: str = "IN PR
     L = lambda h: get_column_letter(col[h])
 
     for i, row in enumerate(rows):
-        fill = LIGHT if i % 2 == 0 else None
+        fill = LIGHT if i % 2 == 0 else LIGHT2
         is_plate = str(row.get("TYPE", "")).strip().upper() in ("PLATE", "BASEPLATE", "BP", "EMBED", "CAP")
         for h in ("MARK", "PIECE", "TYPE", "SIZE", "GRADE", "FINISH", "SHEET", "GRID", "LEVEL", "NOTES"):
             put(r, col[h], row.get(h, "") or "", TXT, fill)
@@ -148,6 +148,9 @@ def add_model_geometry_tab(wb, job: dict, rows: list[dict], status: str = "IN PR
             TXT, fill, Alignment(horizontal="center"))
         r += 1
     last = r - 1
+    if last < first:                      # no rows: keep the formulas valid and the freeze pane off a merged cell
+        last = first
+        put(first, col["MARK"], None, TXT); r = first + 1
     # totals
     put(r, col["MARK"], "TOTAL — modelled pieces", BOLD, LIGHT2)
     ws.merge_cells(start_row=r, start_column=col["MARK"], end_row=r, end_column=col["LEVEL"])
