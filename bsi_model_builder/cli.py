@@ -12,6 +12,15 @@ import argparse, os, sys, tempfile
 from . import __version__, __app_name__
 
 
+def _utf8_console():
+    """Windows consoles default to cp1252; make stdout/stderr UTF-8 (unencodable chars become '?')."""
+    for stream in (sys.stdout, sys.stderr):
+        try:
+            stream.reconfigure(encoding="utf-8", errors="replace")
+        except Exception:
+            pass
+
+
 def _progress(msg: str):
     print(msg, flush=True)
 
@@ -74,6 +83,7 @@ def cmd_selftest(a) -> int:
 
 
 def main(argv=None) -> int:
+    _utf8_console()
     ap = argparse.ArgumentParser(prog="BSI_Model_Builder", description=f"{__app_name__} {__version__}")
     ap.add_argument("--version", action="version", version=f"{__app_name__} {__version__}")
     sub = ap.add_subparsers(dest="cmd")
