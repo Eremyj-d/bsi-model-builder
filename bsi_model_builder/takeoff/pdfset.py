@@ -872,8 +872,8 @@ class DrawingSet:
                 return float(v)
         return None
 
-    def _dimension_between(self, page_index: int, p1: list, p2: list, axis: str, band_pt: float = 80.0) -> tuple[float, str] | None:
-        """Find a feet-inch string lying in the band between two consecutive bubbles.  Returns (feet, text)."""
+    def _dimension_between(self, page_index: int, p1, p2, axis: str, band_pt: float = 120.0) -> tuple[float, str, float] | None:
+        """Find a feet-inch string lying in the band between two consecutive bubbles.  Returns (feet, text, score)."""
         raw = self._raw_text(page_index)
         cands = []
         if axis == "x":
@@ -903,7 +903,7 @@ class DrawingSet:
         if not cands:
             return None
         cands.sort()
-        return cands[0][1], cands[0][2]
+        return cands[0][1], cands[0][2], cands[0][0]
 
     def calibrate(self, bubbles: dict, known_spacings: dict | None = None, page_index: int | None = None,
                   fallback_pt_per_ft: float | None = None) -> dict:
@@ -1087,6 +1087,9 @@ class DrawingSet:
             Lpt = t_hi - t_lo
             rec["line"] = {"p1": p1, "p2": p2, "width": ln.get("width"), "n_parts": ln.get("n_parts", 1),
                            "shared": len(siblings) > 1}
+            if len(siblings) > 1 and (t_lo, t_hi) == (0.0, ln["length"]):
+                # several labels on one undivided stick: each got the whole length — the LLM must split it
+                rec["flag"] = f"SHARED LINE ({len(siblings)} labels)"
             rec["length_pt"] = Lpt
             if k:
                 rec["length_ft"] = Lpt / k
